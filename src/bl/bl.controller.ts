@@ -127,7 +127,7 @@ export class BlController {
         // Information Destinataire
   
         // Information Expediteur
-        pdfDoc.fontSize(10)
+        pdfDoc.fontSize(12)
         .text(' ',{align:'center'})
         .text(' ',{align:'center'})
         .text(`Tunis,Le ${formattedDate}`, {continued:true, align: 'left' })
@@ -145,10 +145,18 @@ export class BlController {
         
         pdfDoc
         .text(' ',{align:'left'})
-        .text('Référence transporteur', { align: 'left', ...textOptions })
+        .text(pargraph, { align: 'left', ...textOptions })
         .moveDown();
+
+        pdfDoc.text("JAX DELIVERY SERVICES,")
+
+
+
+        const pargraph2="Met à votre disposition un parc de véhicules adaptés au transport urgent de vos colis, ainsi qu’une équipe de coursiers chevronnés équipés de moyens de communication modernes et un système d’information fiable permettant le traitementrapide de vos livraisons.Vos colis seront accompagnés de justificatifs de livraison. (Étiquette de transport ou bien bon de livraison)"
         // Now add content to the right colu
         
+        pdfDoc.text(pargraph2) .moveDown(2);
+
 
          /* const width = pdfDoc.widthOfString('Dates pervisionelles');
           const height = pdfDoc.currentLineHeight(0);
@@ -158,92 +166,112 @@ export class BlController {
           .text(`Dates pervisionelles`, { align: 'left'}) // Set font size to 16
             .moveDown();*/
 
-          pdfDoc.fontSize(9)
-          .font('Helvetica')
-            .text(`Date date a partir de date`, { align: 'left'}) // Set font size to 14
-            .text(' ', { align: 'left' })
-            .moveDown();
+            
 
-          pdfDoc.fontSize(9)
-          .font('Helvetica')
-          .text(`Bon de Livraison No: ${bl.reference}`, { align: 'center'}) // Set font size to 18
-            .moveDown();
 
-          pdfDoc.fontSize(9)
-          .font('Helvetica')
-          .text('Transporteur', { align: 'left', continued: true }) // Set font size to 12
-            .text('Date d"enlévement: Date', { align: 'right' })
-            .text('Téléphone', { align: 'left', continued: true }) // Set font size to 12
-            .text('codeQR', { align: 'right'  })
-            .moveDown();
+          pdfDoc.fontSize(14)
+          .font('Helvetica-Bold')
+            .text(`Tarifs JAX DELIVERY SERVICES : (en TTC)`, { align: 'left'})
+            .moveDown(); // Set font size to 14
+            const recyPosition = (pdfDoc.page.height/3)+40;
 
          pdfDoc.lineWidth(1);
          //position
-         const recyPosition = (pdfDoc.page.height/2)+40;//3aml 3al y =tul el page
+       
+
+
+            pdfDoc.y = (pdfDoc.page.height/3)+40 ;
+         //3aml 3al y =tul el page
          
          //Mesures 
-         const widthShape=pdfDoc.page.width-40//3uredh
-         const length=pdfDoc.page.height/7//tul
+         const widthShape=pdfDoc.page.width-50//3uredh
+         const length=(pdfDoc.page.height/7)+10//tul
+    
+          const line=(pdfDoc.page.width/3)-10
+          const line1=widthShape/2
+          const line2=widthShape/4
+          const line3=widthShape/5
+          const yline=length+320
+          console.log("yline =" ,yline)
+          console.log("recyPosition=",recyPosition)
+          console.log("line=",line)
+
 
 
          const xWidth=pdfDoc.page.width
-         const line=pdfDoc.page.width/2
-         const yline=length+460
+         
+        
 
          //y el ktiba
 
          const text2 = [
-          
+          "text"
         ];
         
         const text3 = [
-          
+          "           15 kg"
         ];
         
-        const textTitle2 = 'Information Expediteur';
-        const textTitle3 = 'Information Destinateur';
-        
-        const text = `${text2.join('\n')}\n\n\n${text3.join('\n')}`;
-        
-        pdfDoc.y = recyPosition + 10;
-        
-        pdfDoc
-          .fontSize(12)
-          .font('Helvetica-Bold')
-          .text(textTitle2, { align: 'left', continued: true })
-          .text('                                                     ', {continued: true})
-          .text(textTitle3, { align: 'justify' });
-        pdfDoc
-          .fontSize(12)
-          .font('Helvetica')
-          .text(text, {
-            x: 30,
-            columns: 2,
-            columnGap: 80,
-            height: 85,
-            align: 'justify'
-          });
-        
-     
+        const textTitle2 = ' Information Expediteur';
        
-      pdfDoc
+        
+        const text = `${text3.join('\n')}\n\n\n\n\n${text2.join('\n')}`;
+        
+        const l=line+40
+       const w=widthShape-40
+        
+        pdfDoc
+        .moveDown(1)
+        .fontSize(12)
+          .font('Helvetica')
+          .text(' ', {align:'center'})
+          .text('', {align:'center'})
+          .text('', {align:'center'})
+          .font('Helvetica-Bold')
+          .text(textTitle2, {align:'left'})
+          .text('', {align:'center'})
+          .text('', {align:'center'})
+          .font('Helvetica')
+          .text(`Tarif: ${bl.colisLivré} /colis livré`, {align:'center'})
+          .text('', {align:'center'})
+          .text('', {align:'center'})
+          .font('Helvetica-Bold')
+          .text(text3, { align:'left'})
+          .text('', {align:'center'})
+          .text('', {align:'center'})
+          .font('Helvetica')
+          .text(`Tarif: ${bl.colisLivré} /colis livré\n`, {align:'center'})
+          .text('\n', {align:'center'})
+          .text('', {align:'center'})
+          .text(`Tarif: ${bl.colisLivré} /colis livré`, {align:'center'})
+          ;
+
+          pdfDoc.moveTo(recyPosition+245, l+158)
+          .lineTo(xWidth -408, l+158)
+          .stroke();
+          pdfDoc.moveTo(recyPosition+245, l+130)
+          .lineTo(xWidth -408, l+130)
+          .stroke();
+          pdfDoc.moveTo(recyPosition+245, l+188)
+          .lineTo(xWidth -408, l+188)
+          .stroke();
+      
+  
+          const recy = recyPosition+30;
+
+      pdfDoc.moveDown()
       .moveTo(line, recyPosition)
-      .lineTo(line, yline)
+      .lineTo(line,yline )
       .lineJoin('round')
       .rect(20, recyPosition, widthShape, length)
       .stroke()
-      .moveDown()
-      .moveDown()
       .moveDown(); 
 
      
 
  
 
-      pdfDoc.moveDown(pdfDoc.height)
-      .fontSize(9)
-          .font('Times-Italic')
-          .text(`Signatute`, { align: 'right'}) // Set font size to 18
+       // Set font size to 18
           
 
         //pdfDoc.text(`Destinataire Data:\n${JSON.stringify(destinataire)}`);

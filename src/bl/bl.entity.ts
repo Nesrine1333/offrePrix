@@ -12,11 +12,13 @@ export class Bl {
     @Column()
     dateBl: Date;
 
-    @Column()
-    matriculeFiscale:string;
+  
 
   //Destinaraire
  
+
+@Column()
+  blname:string;
 
     @Column()
     Mob:string  ;
