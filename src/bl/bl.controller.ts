@@ -39,12 +39,6 @@ export class BlController {
     }
 
 
-    //getBdlbydestinataireName
-
- /*   @Get(':id/colis')
-    findColidByBlId(@Param('id') id: number){
-     return this.BlService.findColisByBlId(id);
-    }*/
 
     @Get(':id/User')
     async findUserByUserId(@Param('id')userId: number){
@@ -52,33 +46,7 @@ export class BlController {
     }
 
 
-  /*  @Get(':id/')
-    async savePDF(filePath: string, res: Response,@Param('id') id: number): Promise<void> {
 
-
-      try {
-          const buffer = fs.readFileSync(filePath);
-    
-
-          res.set({
-              'Content-Type': 'application/pdf',
-              'Content-Disposition': `attachment; filename=${filename}`,
-              'Content-Length': buffer.length.toString(),
-          });
-    
-          // Envoyer le fichier au client
-          res.end(buffer);
-    
-          
-          // Supprimer le fichier après l'envoi (facultatif)
-          fs.unlinkSync(filePath);
-    
-      } catch (error) {
-          // Gérer les erreurs de lecture du fichier
-          console.error('Erreur lors de la lecture du fichier PDF:', error);
-          res.status(500).json({ message: 'Internal Server Error' });
-      }
-    }*/
 
     
     @Get(':idBl/createpdf')
@@ -92,7 +60,7 @@ export class BlController {
 
         const fs = require("fs");
         const PDFDocument = require("pdfkit-table");
-        const pdfDoc =new PDFDocument({ margin: 30, size: 'A4', });
+        const pdfDoc =new PDFDocument({ margin: 40, size: 'A4', });
 
 
         const leftColumnX = 50;
@@ -111,9 +79,6 @@ export class BlController {
         const yUpperRight = 10; // Adjust as needed
         
         // Coordinates for the center
-        const xCenter = pdfDoc.page.width / 2;
-        const yCenter = pdfDoc.y;
-        
 
         const formattedDate = bl.dateBl.toLocaleDateString('en-US', {
           year: 'numeric',
@@ -127,41 +92,46 @@ export class BlController {
         // Information Destinataire
   
         // Information Expediteur
-        pdfDoc.fontSize(12)
+        pdfDoc.font('Times-Roman').fontSize(10)
         .text(' ',{align:'center'})
         .text(' ',{align:'center'})
-        .text(`Tunis,Le ${formattedDate}`, {continued:true, align: 'left' })
-        .text(`Nom:${bl.reference}`,{align:'right' })
-        .text(`M.F/CIN :${user.matriculeFiscale}`, {continued:true, align: 'left'} )  
-        .text(`Mob:${bl.Mob}`,{align:'right' })
-        .text(`Fix:${bl.Fixe}`, {continued:true, align: 'left' })  
-        .text(`Email:${bl.address}`,{align:'right' })
-        .text('',{align:'left'})
+        .text(`Nom:${bl.reference}              `,{align:'right' })
+        .text(`Tunis,Le ${formattedDate}`, { align: 'left' ,continued:true})
+        .text(`Mob:${bl.Mob}              `,{align:'right' })
+        .text(`M.F/CIN :${user.matriculeFiscale}`, {continued:true, align: 'left'} )   
+        .text(`                                                                 Email:`, { align: 'center' ,continued:true,})
+        .fillColor('blue')
+        .text('d.commercial@jax-delivery.com', {
+          align: 'right',
+          link: 'mailto:d.commercial@jax-delivery.com',
+        }).fillColor('black')  
+        .text(`Fix:${bl.Fixe}`, { align: 'left',continued:true })  
+        .text(`                                                                                                        site:`,{align:'center',continued:true}).fillColor('blue').text('wwww.jax-delivery.com',{align:'right',link: 'https://jax-delivery.com/',}).fillColor('black')
         .moveDown()
      
         // Référence transportaur
         
         const pargraph="JAX EXPEDITION, entreprise totalement tunisienne, est ravie de vous présenter des solutions de transport adaptées à vos besoins, à travers son service de livraison express (JAX DELIVERY SERVICES) vous pouvez expédier nimporte où à lintérieu du territoire Tunisien dans un délais maximum (transit time) de 72h après lenlèvement du colis."
         
-        pdfDoc
+        pdfDoc.fontSize(12).font('Times-Roman')
         .text(' ',{align:'left'})
         .text(pargraph, { align: 'left', ...textOptions })
         .moveDown();
 
-        pdfDoc.text("JAX DELIVERY SERVICES,")
+        pdfDoc.fontSize(12).font('Times-Roman').text("    JAX DELIVERY SERVICES,").moveDown();
 
 
 
-        const pargraph2="Met à votre disposition un parc de véhicules adaptés au transport urgent de vos colis, ainsi qu’une équipe de coursiers chevronnés équipés de moyens de communication modernes et un système d’information fiable permettant le traitementrapide de vos livraisons.Vos colis seront accompagnés de justificatifs de livraison. (Étiquette de transport ou bien bon de livraison)"
+        const pargraph2="     Met à votre disposition un parc de véhicules adaptés au transport urgent de vos colis, ainsi qu’une équipe de coursiers chevronnés équipés de moyens de communication modernes et un système d’information fiable permettant le traitementrapide de vos livraisons.Vos colis seront accompagnés de justificatifs de livraison. (Étiquette de transport ou bien bon de livraison)"
         // Now add content to the right colu
         
-        pdfDoc.text(pargraph2) .moveDown(2);
+        pdfDoc.fontSize(12).font('Times-Roman').text(pargraph2).moveDown();
 
 
          /* const width = pdfDoc.widthOfString('Dates pervisionelles');
           const height = pdfDoc.currentLineHeight(0);
          /* pdfDoc.fontSize(12)
-          .font('Helvetica-Bold')
+          .font('Times-Roman-Bold')
           .underline(20, 0, width, height)
           .text(`Dates pervisionelles`, { align: 'left'}) // Set font size to 16
             .moveDown();*/
@@ -170,24 +140,22 @@ export class BlController {
 
 
           pdfDoc.fontSize(14)
-          .font('Helvetica-Bold')
+          .font('Times-Bold')
             .text(`Tarifs JAX DELIVERY SERVICES : (en TTC)`, { align: 'left'})
-            .moveDown(); // Set font size to 14
+            .moveDown().moveDown(); // Set font size to 14
             const recyPosition = (pdfDoc.page.height/3)+40;
 
-         pdfDoc.lineWidth(1);
+        
          //position
-       
-
-
-            pdfDoc.y = (pdfDoc.page.height/3)+40 ;
+            pdfDoc.y = (pdfDoc.page.height/3)+25 ;
+          
          //3aml 3al y =tul el page
-         
+         pdfDoc.lineWidth(1);
          //Mesures 
-         const widthShape=pdfDoc.page.width-50//3uredh
+         const widthShape=pdfDoc.page.width-200//3uredh
          const length=(pdfDoc.page.height/7)+10//tul
     
-          const line=(pdfDoc.page.width/3)-10
+          const line=(pdfDoc.page.width/3)
           const line1=widthShape/2
           const line2=widthShape/4
           const line3=widthShape/5
@@ -199,61 +167,48 @@ export class BlController {
 
 
          const xWidth=pdfDoc.page.width
-         
-        
 
          //y el ktiba
-
-         const text2 = [
-          "text"
-        ];
-        
         const text3 = [
-          "           15 kg"
+          "               15 kgMax"
         ];
         
-        const textTitle2 = ' Information Expediteur';
-       
+        const textTitle2 = '   Tout le territoire Tunisien';
+      
         
-        const text = `${text3.join('\n')}\n\n\n\n\n${text2.join('\n')}`;
-        
-        const l=line+40
+        const l=line+30
        const w=widthShape-40
-        
+        pdfDoc.x=50;
         pdfDoc
-        .moveDown(1)
+        .moveDown(1.5)
         .fontSize(12)
-          .font('Helvetica')
-          .text(' ', {align:'center'})
+          .font('Times-Roman')
+          .text(`          Tarif:   ${bl.colisLivré}   /colis livré                                   `, {align:'center'})
           .text('', {align:'center'})
           .text('', {align:'center'})
-          .font('Helvetica-Bold')
+          .font('Times-Bold')
           .text(textTitle2, {align:'left'})
           .text('', {align:'center'})
           .text('', {align:'center'})
-          .font('Helvetica')
-          .text(`Tarif: ${bl.colisLivré} /colis livré`, {align:'center'})
+          .font('Times-Roman')
+          .text(`          Tarif:   ${bl.colisRetour}   /colis retour                                     `, {align:'center'})
           .text('', {align:'center'})
           .text('', {align:'center'})
-          .font('Helvetica-Bold')
-          .text(text3, { align:'left'})
-          .text('', {align:'center'})
-          .text('', {align:'center'})
-          .font('Helvetica')
-          .text(`Tarif: ${bl.colisLivré} /colis livré\n`, {align:'center'})
-          .text('\n', {align:'center'})
-          .text('', {align:'center'})
-          .text(`Tarif: ${bl.colisLivré} /colis livré`, {align:'center'})
+          .font('Times-Bold')
+          .text(text3, { align:'left',lineGap: 5})
+          .font('Times-Roman')
+          .text(`          Tarif:   ${bl.colisechange}   /colis échange                               `, {align:'center',lineGap: 16 })
+          .text(`          Tarif:   ${bl.COD}   /COD                                          `, {align:'center'})
           ;
 
-          pdfDoc.moveTo(recyPosition+245, l+158)
-          .lineTo(xWidth -408, l+158)
+          pdfDoc.moveTo(recyPosition+125, l+124)
+          .lineTo(xWidth -397, l+124)
           .stroke();
-          pdfDoc.moveTo(recyPosition+245, l+130)
-          .lineTo(xWidth -408, l+130)
+          pdfDoc.moveTo(recyPosition+125, l+153)
+          .lineTo(xWidth -397, l+153)
           .stroke();
-          pdfDoc.moveTo(recyPosition+245, l+188)
-          .lineTo(xWidth -408, l+188)
+          pdfDoc.moveTo(recyPosition+125, l+183)
+          .lineTo(xWidth -397, l+183)
           .stroke();
       
   
@@ -263,18 +218,72 @@ export class BlController {
       .moveTo(line, recyPosition)
       .lineTo(line,yline )
       .lineJoin('round')
-      .rect(20, recyPosition, widthShape, length)
+      .rect(50, recyPosition, widthShape, length)
       .stroke()
+      .moveDown()
       .moveDown(); 
-
-     
-
- 
 
        // Set font size to 18
           
 
-        //pdfDoc.text(`Destinataire Data:\n${JSON.stringify(destinataire)}`);
+       pdfDoc.fontSize(14)
+       .font('Times-Bold')
+       .text('Zones de couverture & Délais de livraison :', {align:'left'}).
+       moveDown();
+
+       pdfDoc.fontSize(12)
+       .font('Times-Bold')
+       .text('•   Zone du GRAND TUNIS', {align:'left'}).font('Times-Roman').
+       text('     Tunis, Ben Arous, Ariana, Manouba, Zaghouan, Bizerte.',{continued:true}).fillColor('#0d9436').text(' Transit time 24/48h').fillColor('black')
+       .font('Times-Bold').text('•    Zone du GRAND SAHEL', {align:'left'}).font('Times-Roman').
+       text('     Nabeul, Sousse, Monastir, Mahdia.',{continued:true}).fillColor('#0d9436') .text('Transit time 24/48',).fillColor('black').
+       font('Times-Bold').text('•    Zone du NORD OUEST', {align:'left'}).font('Times-Roman').
+       text('     Beja, Jendouba, Kef, Siliana.',{continued:true}).fillColor('#0d9436') .text('Transit time 24/72h',).fillColor('black').
+       font('Times-Bold').text('•    Zone du CENTRE', {align:'left'}).font('Times-Roman').
+       text('     Sfax, Kairouan, Sidi Bouzid, Kasserine, Gabes.',{continued:true}).fillColor('#0d9436').text('Transit time 24/72h',).fillColor('black').
+      font('Times-Bold'). text('•    Zone du SUD', {align:'left'}).font('Times-Roman').
+       text('     Gafsa, Tozeur, Kébili, Médenine, Tataouine.',{continued:true}).fillColor('#0d9436').text('Transit time 24/72h',).fillColor('black').
+       moveDown();
+                
+      pdfDoc.fontSize(14).font('Times-Bold').text('Termes et conditions', {align:'left'}).moveDown();
+
+      const text1=' 3 passages de livraison (si nécessaire) pour chaque expédition';
+      const textt2=' Suivie des colis en temps réel via un système d"information web'
+      const textt3=' Gestion des réclamations (tickets) en temps réel via un système d"information web'
+      const textt4=' Suivi du recouvrement en temps réel via un système d"information web'
+      const textt5='Versement des montants collectés dans le compte de l"expéditeur à raison de 2 fois / semaine (RIB à fournir).'
+      const textt6='Remboursement de 100% de la valeur de la marchandise par envoi perdu ou endommagé.'
+      const textt7='Une Assurance RC sur l"ensemble des colis endommagés pouvons allez jusqu"à 50 milles dinars.'
+
+      pdfDoc.font('Times-Roman').fontSize(12).list([text1,
+        textt2,
+        textt3,
+        textt4,
+        textt5,
+        textt6,
+        textt7], 30, 670, {
+        // this is how automatic line wrapping will work if the width is specified
+        width: 550,
+        align: 'left',
+        listType: 'bullet',
+        bulletRadius: 1.5, // use this value to almost hide the dots/bullets
+      });
+
+
+     
+            pdfDoc.moveDown().fontSize(10).font('Times-Bold').text('      Signature et cachet du client');
+            pdfDoc.font('Times-Italic').text('         Précédées de la mention « Bon pour accord »')
+            const recyPositionSigh = (pdfDoc.page.height/2)-170;
+
+            const lineSign=(pdfDoc.page.width/2)+495
+            const ylineSign=recyPositionSigh+410
+      
+            pdfDoc.lineWidth(0.2);
+            pdfDoc.moveDown()
+                  .moveTo( recyPositionSigh,lineSign)
+                  .lineTo(ylineSign,lineSign )
+                  .lineJoin('round').stroke();
+      
 
         const date = new Date();
         const year = date.getFullYear();
