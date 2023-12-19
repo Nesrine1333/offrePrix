@@ -23,20 +23,12 @@ export class AuthController {
 
   //logo n est pas obligatoire dans register
   @Post('register')
-  @UseInterceptors(FileInterceptor('logo'))
   async register(
-    @Body() user: User,
-    @UploadedFile() logo?: Multer.File,
+    @Body() user: User
   ) {
     const hashedPassword = await bcrypt.hash(user.password, 12);
 
     let logoFileName: string | undefined;
-
-    if (logo) {
-      logoFileName = `${Date.now()}_${logo.originalname}`;
-      const filePath = path.join(__dirname, '..', '..', 'uploads', logoFileName);
-      await this.saveFile(logo.buffer, filePath);
-    }
 
     const creatUser = await this.authService.create({
       ...user,
@@ -49,19 +41,7 @@ export class AuthController {
     return creatUser;
   }
 
-  private saveFile(buffer: Buffer, filePath: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      require('fs').writeFile(filePath, buffer, (error) => {
-        if (error) {
-          console.error(`Error saving file at ${filePath}: ${error.message}`);
-          reject(error);
-        } else {
-          console.log(`File saved successfully at ${filePath}`);
-          resolve();
-        }
-      });
-    });
-  }
+  
 
   // modify return values => we need all informations like (errors, transcation succes or not,the logged user)
   @Post('login')
@@ -88,9 +68,7 @@ export class AuthController {
     return {
       user: {
         id: user.id,
-        name: user.nom,
         email: user.email,
-        phoneNumber: user.phoneNumber
       },
       token: jwt,
       succes: true,
@@ -111,7 +89,7 @@ export class AuthController {
 
   //pour aff log user
   //@UseGuards(JwtAuthGuard): pour que cette méthode ça marche seulement aprés login
-  @Get('image/:userId')
+  /*@Get('image/:userId')
   @UseGuards(JwtAuthGuard)
   async serveImage(@Param('userId') userId: number, @Res() res: Response) {
     const user = await this.authService.findOneById(userId);
@@ -131,10 +109,10 @@ export class AuthController {
       throw new NotFoundException('User not found');
     }
   }
-
+*/
 
   //change logo
-  @Put(':iduser/update-logo')
+ /* @Put(':iduser/update-logo')
   @UseInterceptors(FileInterceptor('logo'))
   async updateLogo(
     @Param('iduser') iduser: number,
@@ -186,7 +164,7 @@ export class AuthController {
       });
     });
   }
-
+*/
 
   //changer password par user
   @Put(':iduser/change-password')

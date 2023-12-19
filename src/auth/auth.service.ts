@@ -56,7 +56,7 @@ export class AuthService {
   }
 
   //update logo user
-  async updateLogo(userId: number, newLogoFileName: string): Promise<User> {
+/*  async updateLogo(userId: number, newLogoFileName: string): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
     if (!user) {
@@ -65,7 +65,7 @@ export class AuthService {
 
     user.logo = newLogoFileName;
     return this.userRepository.save(user);
-  }
+  }*/
 
   //Récupère l'utilisateur depuis le référentiel en utilisant le userId pour creer restcode
 

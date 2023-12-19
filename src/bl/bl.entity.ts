@@ -12,11 +12,13 @@ export class Bl {
     @Column()
     dateBl: Date;
 
-    @Column()
-    matriculeFiscale:string;
+  
 
   //Destinaraire
  
+
+@Column()
+  blname:string;
 
     @Column()
     Mob:string  ;
@@ -29,7 +31,7 @@ export class Bl {
     address:String;
 
     @Column()
-    colisLivré:number;
+    colisLivre:number;
 
     @Column()
     colisRetour:number;
