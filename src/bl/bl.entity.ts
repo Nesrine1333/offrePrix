@@ -31,7 +31,7 @@ export class Bl {
     address:String;
 
     @Column()
-    colisLivré:number;
+    colisLivre:number;
 
     @Column()
     colisRetour:number;
