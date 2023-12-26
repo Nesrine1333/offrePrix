@@ -15,7 +15,8 @@ import { EmailService } from 'src/Email/email.service';
     imports: [TypeOrmModule.forFeature([Bl,User]),AuthModule,UserModule],
     providers: [BlService,AuthService,EmailService],
     controllers: [BlController],
-    exports: [TypeOrmModule],
+    exports: [TypeOrmModule,BlService],
+  
 
 
 })

@@ -9,7 +9,7 @@ import { Response } from 'express';
 import {join } from 'path';
 import * as fs from 'fs';
 import { readdirSync } from 'fs';
-import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
+import { IPaginationMeta, IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
 import { ICustomPaginationOptions } from './DTO/ICustomPaginationOptions';
 
 
@@ -39,6 +39,12 @@ export class BlController {
     }
 
 
+    //getBdlbydestinataireName
+
+ /*   @Get(':id/colis')
+    findColidByBlId(@Param('id') id: number){
+     return this.BlService.findColisByBlId(id);
+    }*/
 
     @Get(':id/User')
     async findUserByUserId(@Param('id')userId: number){
@@ -46,7 +52,33 @@ export class BlController {
     }
 
 
+  /*  @Get(':id/')
+    async savePDF(filePath: string, res: Response,@Param('id') id: number): Promise<void> {
 
+
+      try {
+          const buffer = fs.readFileSync(filePath);
+    
+
+          res.set({
+              'Content-Type': 'application/pdf',
+              'Content-Disposition': `attachment; filename=${filename}`,
+              'Content-Length': buffer.length.toString(),
+          });
+    
+          // Envoyer le fichier au client
+          res.end(buffer);
+    
+          
+          // Supprimer le fichier après l'envoi (facultatif)
+          fs.unlinkSync(filePath);
+    
+      } catch (error) {
+          // Gérer les erreurs de lecture du fichier
+          console.error('Erreur lors de la lecture du fichier PDF:', error);
+          res.status(500).json({ message: 'Internal Server Error' });
+      }
+    }*/
 
     
     @Get(':idBl/createpdf')
@@ -55,12 +87,11 @@ export class BlController {
 
         const bl = await this.BlService.findOne(idBl);
         const user=await this.BlService.findUserByBlId(idBl);
-      
 
 
         const fs = require("fs");
         const PDFDocument = require("pdfkit-table");
-        const pdfDoc =new PDFDocument({ margin: 40, size: 'A4', });
+        const pdfDoc =new PDFDocument({ margin: 30, size: 'A4', });
 
 
         const leftColumnX = 50;
@@ -68,16 +99,34 @@ export class BlController {
         const rightColumnX = leftColumnX + columnGap;  // Calculate the X-coordinate for the right column
         const textOptions = {font:'Times-Roman',fontSize: 12};
 
-     
+        
+        const image ='jax.png';
+
+        
+      
+        const imagePath = path.resolve(__dirname, '..', '..', 'uploads', image);
+        
+        const xUpperRight = 0;
+        const yUpperRight = 0;
+        const fullWidth = pdfDoc.page.width;
+
+
+               
+         pdfDoc
+               .image(imagePath, xUpperRight, yUpperRight, { width: fullWidth });
+
         const x = 50;
         const y = 150;
 
-      
-        
+      pdfDoc.y=10;
+      pdfDoc.fillColor('white').text('Matricule Fiscale',{align: 'right'}).moveDown(0.5);
+      pdfDoc.fillColor('#a89413').text('1667460L/A/M/000',{align: 'right'});
 
-        const xUpperRight = pdfDoc.page.width - 120; // Adjust as needed
-        const yUpperRight = 10; // Adjust as needed
+        // Adjust as needed
+        // Adjust as needed
         
+        
+      
         // Coordinates for the center
 
         const formattedDate = bl.dateBl.toLocaleDateString('en-US', {
@@ -92,7 +141,7 @@ export class BlController {
         // Information Destinataire
   
         // Information Expediteur
-        pdfDoc.font('Times-Roman').fontSize(10)
+        pdfDoc.fillColor('black').font('Times-Roman').fontSize(10)
         .text(' ',{align:'center'})
         .text(' ',{align:'center'})
         .text(`Nom:${bl.reference}              `,{align:'right' })
@@ -183,7 +232,7 @@ export class BlController {
         .moveDown(1.5)
         .fontSize(12)
           .font('Times-Roman')
-          .text(`          Tarif:   ${bl.colisLivré}   /colis livré                                   `, {align:'center'})
+          .text(`      Tarif:   ${bl.colisLivre}   /colis livré                                   `, {align:'center'})
           .text('', {align:'center'})
           .text('', {align:'center'})
           .font('Times-Bold')
@@ -197,8 +246,8 @@ export class BlController {
           .font('Times-Bold')
           .text(text3, { align:'left',lineGap: 5})
           .font('Times-Roman')
-          .text(`          Tarif:   ${bl.colisechange}   /colis échange                               `, {align:'center',lineGap: 16 })
-          .text(`          Tarif:   ${bl.COD}   /COD                                          `, {align:'center'})
+          .text(`        Tarif:   ${bl.colisechange}   /colis échange                               `, {align:'center',lineGap: 16 })
+          .text(`       Tarif:   ${bl.COD}   /COD                                          `, {align:'center'})
           ;
 
           pdfDoc.moveTo(recyPosition+125, l+124)
@@ -360,6 +409,7 @@ export class BlController {
 
 
 
+
  
 
   @Post(':idUser/createbl')
@@ -367,7 +417,7 @@ export class BlController {
     try {
         const bl = await this.BlService.create(idUser, createBlDto);
         await this.generatePdf(bl.id, res);
-        res.json(bl.id);
+        res.json({ blId: bl.id });
         return bl;
         
     } catch (error) {
@@ -507,21 +557,22 @@ async getBlByUserIdAndFiltrage(
   @Param('idUser', ParseIntPipe) userId: number,
   @Param('page', ParseIntPipe) page: number,@Param('limit', ParseIntPipe) limit: number,
   @Query('dateBl') dateBl?: Date,
-  @Query('nomDest') nomDest?: string,
-  @Query('blname') blname?: string, 
-): Promise<Bl[]> {
-  const options: ICustomPaginationOptions = {
-    page,
-    limit,
-    route: `${userId}`,
-    filters: {
-      dateBl,
-      nomDest,
-      blname,
-    },
-  };
+  @Query('matriculeFiscale') matriculeFiscale?: string,
+  @Query('reference') reference?: string, 
+  ): Promise<Pagination<Bl, IPaginationMeta>> {
+    const options: ICustomPaginationOptions = {
+      page,
+      limit,
+      route: `${userId}`,
+      filters: {
+        dateBl,
+        matriculeFiscale,
+        reference,
+      },
+    };
 
   return this.BlService.paginateFiltrage(userId, options);
+
 }
 
 

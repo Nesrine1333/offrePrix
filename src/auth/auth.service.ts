@@ -34,11 +34,9 @@ export class AuthService {
 
 
   async create(data: any): Promise<User> {
-    const idd=uuidv4()
-      return this.userRepository.save({
-        id:this.uuidv4ToInt(idd),
-        ...data});
-
+    return this.userRepository.save({
+      ...data,
+    });
   }
 
   // improve error handling 
@@ -56,7 +54,7 @@ export class AuthService {
   }
 
   //update logo user
-/*  async updateLogo(userId: number, newLogoFileName: string): Promise<User> {
+ /* async updateLogo(userId: number, newLogoFileName: string): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
     if (!user) {

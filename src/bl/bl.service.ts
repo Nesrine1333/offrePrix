@@ -15,6 +15,7 @@ import {
   paginate,
   Pagination,
   IPaginationOptions,
+  IPaginationMeta,
 } from 'nestjs-typeorm-paginate';
 import { parse } from 'uuid';
 import * as uuid from 'uuid';
@@ -183,22 +184,23 @@ export class BlService {
            }
 
 
-           async paginateFiltrage(userId: number, options: ICustomPaginationOptions): Promise<Bl[]> {
+           async paginateFiltrage(userId: number, options: ICustomPaginationOptions): Promise<Pagination<Bl, IPaginationMeta>> {
             const queryBuilder = this.blRepository.createQueryBuilder('bl');
             queryBuilder.where('bl.userId = :userId', { userId });
             if (options.filters && options.filters.dateBl) {
-                queryBuilder.andWhere('bl.dateBl = :dateBl', { dateBl: options.filters.dateBl });
+              queryBuilder.andWhere('bl.dateBl = :dateBl', { dateBl: options.filters.dateBl });
             }
-            if (options.filters && options.filters.nomDest) {
-                queryBuilder.andWhere('bl.nomDest = :nomDest', { nomDest: options.filters.nomDest });
+            if (options.filters && options.filters.matriculeFiscale) {
+              queryBuilder.andWhere('bl.matriculeFiscale = :matriculeFiscale', { matriculeFiscale: options.filters.matriculeFiscale });
             }
-            if (options.filters && options.filters.blname) {
-                queryBuilder.andWhere('bl.blname = :blname', { blname: options.filters.blname });
+            if (options.filters && options.filters.reference) {
+              queryBuilder.andWhere('bl.reference = :reference', { blname: options.filters.reference });
             }    
-            const paginationResult = await paginate<Bl>(queryBuilder, options);
-            const items: Bl[] = paginationResult.items;
-            return items;
-        }
+            
+            const paginationResult = await paginate<Bl, IPaginationMeta>(queryBuilder, options);
+            return paginationResult;
+          }
+          
     
 
 }
