@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, NotFoundException, Param, Post, Put, Delete, Req, Res, UnauthorizedException, InternalServerErrorException, UseInterceptors, UploadedFile, HttpStatus } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, NotFoundException, Param, Post, Put, Delete, Req, Res, UnauthorizedException, InternalServerErrorException, UseInterceptors, UploadedFile, HttpStatus, ParseIntPipe, Query } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Response, Request } from 'express';
 import { UseGuards } from '@nestjs/common';
@@ -10,6 +10,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Multer } from 'multer';
 import * as fs from 'fs';
 import { JwtService } from "@nestjs/jwt";
+import { Pagination, IPaginationMeta } from 'nestjs-typeorm-paginate';
+import { Bl } from 'src/bl/Bl.entity';
+import { ICustomPaginationOptions } from 'src/bl/DTO/ICustomPaginationOptions';
+import { IUserPagination } from 'src/user/dto/IUserPagination ';
 
 
 @Controller('api')
@@ -107,6 +111,7 @@ async register1(@Body() user: User) {
         matriculeFiscale: user.matriculeFiscale,
         name:user.name,
         email:user.email,
+        role:user.role
       },
       token: jwt,
       succes: true,
@@ -287,5 +292,24 @@ async register1(@Body() user: User) {
   @Get('/finduser/:id')//te5dem
   findUser(@Param('id') id: number) {
     return this.authService.findOneById(id);
+  }
+
+  @Get('/getALLUsers/:page/:limit')
+  getAllUsers( @Param('page', ParseIntPipe) page: number,@Param('limit', ParseIntPipe) limit: number,
+  @Query('email')email?: string,
+  @Query('matriculeFiscale') matriculeFiscale?: string,
+  @Query('name') name?: string, 
+  ): Promise<Pagination<User, IPaginationMeta>> {
+    const options: IUserPagination = {
+      page,
+      limit,
+      filters: {
+        email,
+        matriculeFiscale,
+        name,
+
+      },
+    };
+return this.authService.getallUsers(options);
   }
 }

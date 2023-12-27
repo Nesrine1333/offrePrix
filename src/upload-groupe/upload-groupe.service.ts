@@ -77,15 +77,16 @@ export class UploadGroupeService {
               currentDate.getDate(),
             ),
             user: user,
-            matriculeFiscale: row[1],
-            Mob: row[2],
-            Fixe: row[3],
-            address: row[4],
-            colisLivre: row[5],
-            colisRetour: row[6],
-            colisechange: row[7],
-            COD: row[8],
-            reference: row[9],
+            matriculeFiscale: row[1] || '',
+            CIN:row[2] || '',
+            Mob: row[3],
+            Fixe: row[4],
+            address: row[5],
+            colisLivre: row[6],
+            colisRetour: row[7],
+            colisechange: row[8],
+            COD: row[9],
+            reference: row[10],
             blname: blname, 
           };
         });
@@ -103,7 +104,7 @@ export class UploadGroupeService {
       const worksheet = workbook.addWorksheet('EXEL');
   
       // Add headers
-      worksheet.addRow(['matriculeFiscale', 'Mob', 'Fixe', 'address', 'colisLivre', 'colisRetour', 'colisechange', 'COD', 'reference']);
+      worksheet.addRow(['matriculeFiscale','CIN', 'Mob', 'Fixe', 'address', 'colisLivre', 'colisRetour', 'colisechange', 'COD', 'reference']);
   
       // Save the workbook to a file
       const filePath = `exel_data.xlsx${Date.now()}.xlsx`;

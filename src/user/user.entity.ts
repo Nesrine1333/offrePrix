@@ -17,6 +17,9 @@ export class User {
     @Column({ nullable: true })
     resetCode: number;
 
+    @Column()
+    role:string;
+
    @OneToMany(() => Bl, (bonDeLiv) => bonDeLiv.user)
   bonDeLiv: Bl[];
 

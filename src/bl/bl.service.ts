@@ -102,8 +102,21 @@ export class BlService {
       } 
 
     // find All BLs
-    findAll(): Promise<Bl[]> {
-        return this.blRepository.find();
+    async findAll( options: ICustomPaginationOptions): Promise<Pagination<Bl, IPaginationMeta>> {
+      const queryBuilder = this.blRepository.createQueryBuilder('bl');
+      if (options.filters && options.filters.dateBl) {
+        queryBuilder.andWhere('bl.dateBl = :dateBl', { dateBl: options.filters.dateBl });
+      }
+      if (options.filters && options.filters.matriculeFiscale) {
+        queryBuilder.andWhere('bl.matriculeFiscale = :matriculeFiscale', { matriculeFiscale: options.filters.matriculeFiscale });
+      }
+      if (options.filters && options.filters.reference) {
+        queryBuilder.andWhere('bl.reference = :reference', { blname: options.filters.reference });
+      }    
+      
+      const paginationResult = await paginate<Bl, IPaginationMeta>(queryBuilder, options);
+      return paginationResult;
+    
     }
 
     // find BL by her id

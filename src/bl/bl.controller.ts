@@ -21,9 +21,22 @@ export class BlController {
     ) { }
 
     //Api findAll BLs
-    @Get()
-    findAll() {
-        return this.BlService.findAll();
+    @Get('/allofferes/:page/:limit')
+    findAll( @Param('page', ParseIntPipe) page: number,@Param('limit', ParseIntPipe) limit: number,
+    @Query('dateBl') dateBl?: Date,
+    @Query('matriculeFiscale') matriculeFiscale?: string,
+    @Query('reference') reference?: string ): Promise<Pagination<Bl, IPaginationMeta>> {
+      const options: ICustomPaginationOptions = {
+        page,
+        limit,
+        filters: {
+          dateBl,
+          matriculeFiscale,
+          reference,
+        },
+      };
+
+        return this.BlService.findAll(options);
     }
 
     //API find BL by id 
@@ -80,6 +93,9 @@ export class BlController {
       }
     }*/
 
+
+   
+
     
     @Get(':idBl/createpdf')
     async generatePdf(@Param('idBl') idBl: number, @Res() res: Response) {
@@ -120,7 +136,7 @@ export class BlController {
 
       pdfDoc.y=10;
       pdfDoc.fillColor('white').text('Matricule Fiscale',{align: 'right'}).moveDown(0.5);
-      pdfDoc.fillColor('#a89413').text('1667460L/A/M/000',{align: 'right'});
+      pdfDoc.fillColor('#a89413').text(`1667460L/A/M/000`,{align: 'right'});
 
         // Adjust as needed
         // Adjust as needed
@@ -147,7 +163,7 @@ export class BlController {
         .text(`Nom:${bl.reference}              `,{align:'right' })
         .text(`Tunis,Le ${formattedDate}`, { align: 'left' ,continued:true})
         .text(`Mob:${bl.Mob}              `,{align:'right' })
-        .text(`M.F/CIN :${user.matriculeFiscale}`, {continued:true, align: 'left'} )   
+        .text(`M.F/CIN :${bl.getNonEmptyIdentifier() }`, {continued:true, align: 'left'} )   
         .text(`                                                                 Email:`, { align: 'center' ,continued:true,})
         .fillColor('blue')
         .text('d.commercial@jax-delivery.com', {
@@ -160,7 +176,7 @@ export class BlController {
      
         // Référence transportaur
         
-        const pargraph="JAX EXPEDITION, entreprise totalement tunisienne, est ravie de vous présenter des solutions de transport adaptées à vos besoins, à travers son service de livraison express (JAX DELIVERY SERVICES) vous pouvez expédier nimporte où à lintérieu du territoire Tunisien dans un délais maximum (transit time) de 72h après lenlèvement du colis."
+        const pargraph="JAX EXPEDITION, entreprise totalement tunisienne, est ravie de vous présenter des solutions de transport adaptées à vos besoins, à travers son service de livraison express (JAX DELIVERY SERVICES) vous pouvez expédier nimporte où à l’intérieu du territoire Tunisien dans un délais maximum (transit time) de 72h après l’enlèvement du colis."
         
         pdfDoc.fontSize(12).font('Times-Roman')
         .text(' ',{align:'left'})
@@ -171,7 +187,7 @@ export class BlController {
 
 
 
-        const pargraph2="     Met à votre disposition un parc de véhicules adaptés au transport urgent de vos colis, ainsi qu’une équipe de coursiers chevronnés équipés de moyens de communication modernes et un système d’information fiable permettant le traitementrapide de vos livraisons.Vos colis seront accompagnés de justificatifs de livraison. (Étiquette de transport ou bien bon de livraison)"
+        const pargraph2="     Met à votre disposition un parc de véhicules adaptés au transport urgent de vos colis, ainsi qu’une équipe de coursiers chevronnés équipés de moyens de communication modernes et un système d’information fiable permettant le traitement rapide de vos livraisons.Vos colis seront accompagnés de justificatifs de livraison. (Étiquette de transport ou bien bon de livraison)"
         // Now add content to the right colu
         
         pdfDoc.fontSize(12).font('Times-Roman').text(pargraph2).moveDown();
@@ -219,7 +235,7 @@ export class BlController {
 
          //y el ktiba
         const text3 = [
-          "               15 kgMax"
+          `               ${bl.poids} kgMax`
         ];
         
         const textTitle2 = '   Tout le territoire Tunisien';
@@ -297,12 +313,12 @@ export class BlController {
       pdfDoc.fontSize(14).font('Times-Bold').text('Termes et conditions', {align:'left'}).moveDown();
 
       const text1=' 3 passages de livraison (si nécessaire) pour chaque expédition';
-      const textt2=' Suivie des colis en temps réel via un système d"information web'
-      const textt3=' Gestion des réclamations (tickets) en temps réel via un système d"information web'
-      const textt4=' Suivi du recouvrement en temps réel via un système d"information web'
-      const textt5='Versement des montants collectés dans le compte de l"expéditeur à raison de 2 fois / semaine (RIB à fournir).'
+      const textt2=' Suivie des colis en temps réel via un système d’information web'
+      const textt3=' Gestion des réclamations (tickets) en temps réel via un système d’information web'
+      const textt4=' Suivi du recouvrement en temps réel via un système d’information web'
+      const textt5=`Versement des montants collectés dans le compte de l’expéditeur à raison de ${bl.duree} fois / semaine (RIB à fournir).`
       const textt6='Remboursement de 100% de la valeur de la marchandise par envoi perdu ou endommagé.'
-      const textt7='Une Assurance RC sur l"ensemble des colis endommagés pouvons allez jusqu"à 50 milles dinars.'
+      const textt7='Une Assurance RC sur l’ensemble des colis endommagés pouvons allez jusqu’à 50 milles dinars.'
 
       pdfDoc.font('Times-Roman').fontSize(12).list([text1,
         textt2,

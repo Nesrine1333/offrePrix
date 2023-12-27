@@ -12,11 +12,13 @@ export class Bl {
     @Column()
     dateBl: Date;
 
-    @Column()
-    matriculeFiscale:string;
+    @Column({nullable:true})
+    MF:string;
 
   //Destinaraire
  
+    @Column({nullable:true})
+    CIN:string;
 
     @Column()
     Mob:string  ;
@@ -47,9 +49,30 @@ export class Bl {
     @Column()
     reference:string;
 
+    @Column()
+    verified:boolean;
+
+    @Column()
+    poids:string;
+
+    @Column()
+    duree:string;
+
+
+
+
     @ManyToOne(()=> User,(user)=> user.bonDeLiv)
     @JoinColumn({ name: 'userId'  })
     user: User
 
+// cin /matricule yetzdush mel loul 
+//contract 
+//poids yetbadel    fel form tetzed mta3 create
+//semain tetbadel 
+//matricule fiscale 7shiffre/lettre/000   nesa2lu Dhia
 
+
+getNonEmptyIdentifier(): string {
+  return this.MF || this.CIN;
+}
 }

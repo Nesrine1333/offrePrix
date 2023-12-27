@@ -8,6 +8,14 @@ import { parse } from 'uuid';
 import * as uuid from 'uuid';
 import * as crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
+import { ICustomPaginationOptions } from 'src/bl/DTO/ICustomPaginationOptions';
+import {
+  paginate,
+  Pagination,
+  IPaginationOptions,
+  IPaginationMeta,
+} from 'nestjs-typeorm-paginate';
+import { IUserPagination } from 'src/user/dto/IUserPagination ';
 
 @Injectable()
 export class AuthService {
@@ -159,4 +167,20 @@ export class AuthService {
     await this.userRepository.save(user);
   }
 
+
+  async getallUsers( options: IUserPagination): Promise<Pagination<User, IPaginationMeta>> {
+    const queryBuilder = this.userRepository.createQueryBuilder('user');
+    if (options.filters && options.filters.matriculeFiscale) {
+      queryBuilder.andWhere('user.matriculeFiscale = :matriculeFiscale', { matriculeFiscale: options.filters.matriculeFiscale });
+    }
+    if (options.filters && options.filters.email) {
+      queryBuilder.andWhere('user.email = :email', { email: options.filters.email });
+    }
+    if (options.filters && options.filters.name) {
+      queryBuilder.andWhere('user.name = :name', { username: options.filters.name});
+    }    
+    
+    const paginationResult = await paginate<User, IPaginationMeta>(queryBuilder, options);
+    return paginationResult;
+  }
 }
